@@ -191,6 +191,8 @@ class TestTdBacktest(unittest.TestCase):
             1. 21：00起始时刻两个有夜盘合约下单，无夜盘合约不能下单；
             2. 在正常夜盘可下单时段两个有夜盘合约能下单,无夜盘合约不能成；
             3. 23：00某一夜盘合约停止交易后不能下单，另一有夜盘合约能下单；
+            {'datetime': '2019-12-02 14:59:59.999999', 'ask_price1': 47400.0, 'ask_volume1': 1, 'bid_price1': 47380.0, 'bid_volume1': 1, 'ask_price2': nan, 'ask_volume2': 0, 'bid_price2': nan, 'bid_volume2': 0, 'ask_price3': nan, 'ask_volume3': 0, 'bid_price3': nan, 'bid_volume3': 0, 'ask_price4': nan, 'ask_volume4': 0, 'bid_price4': nan, 'bid_volume4': 0, 'ask_price5': nan, 'ask_volume5': 0, 'bid_price5': nan, 'bid_volume5': 0, 'last_price': 47390.0, 'highest': nan, 'lowest': nan, 'open': nan, 'close': nan, 'average': nan, 'volume': 0, 'amount': nan, 'open_interest': 70447, 'settlement': nan, 'upper_limit': nan, 'lower_limit': nan, 'pre_open_interest': 0, 'pre_settlement': nan, 'pre_close': nan, 'price_tick': 10, 'price_decs': 0, 'volume_multiple': 5, 'max_limit_order_volume': 500, 'max_market_order_volume': 0, 'min_limit_order_volume': 0, 'min_market_order_volume': 0, 'underlying_symbol': '', 'strike_price': nan, 'ins_class': 'FUTURE', 'instrument_id': 'SHFE.cu2002', 'expired': False, 'trading_time': {day: [['09:00:00', '10:15:00'], ['10:30:00', '11:30:00'], ['13:30:00', '15:00:00']], night: [['21:00:00', '25:00:00']]}, 'expire_datetime': 1581922800.0, 'delivery_month': 2, 'delivery_year': 2020, 'option_class': '', 'product_id': 'cu', 'iopv': nan, 'margin': 16443.0, 'commission': 11.745000000000001}
+            {'datetime': '2019-12-02 21:00:00.000000', 'ask_price1': 47330.0, 'ask_volume1': 1, 'bid_price1': 47310.0, 'bid_volume1': 1, 'ask_price2': nan, 'ask_volume2': 0, 'bid_price2': nan, 'bid_volume2': 0, 'ask_price3': nan, 'ask_volume3': 0, 'bid_price3': nan, 'bid_volume3': 0, 'ask_price4': nan, 'ask_volume4': 0, 'bid_price4': nan, 'bid_volume4': 0, 'ask_price5': nan, 'ask_volume5': 0, 'bid_price5': nan, 'bid_volume5': 0, 'last_price': 47320.0, 'highest': nan, 'lowest': nan, 'open': nan, 'close': nan, 'average': nan, 'volume': 0, 'amount': nan, 'open_interest': 70447, 'settlement': nan, 'upper_limit': nan, 'lower_limit': nan, 'pre_open_interest': 0, 'pre_settlement': nan, 'pre_close': nan, 'price_tick': 10, 'price_decs': 0, 'volume_multiple': 5, 'max_limit_order_volume': 500, 'max_market_order_volume': 0, 'min_limit_order_volume': 0, 'min_market_order_volume': 0, 'underlying_symbol': '', 'strike_price': nan, 'ins_class': 'FUTURE', 'instrument_id': 'SHFE.cu2002', 'expired': False, 'trading_time': {day: [['09:00:00', '10:15:00'], ['10:30:00', '11:30:00'], ['13:30:00', '15:00:00']], night: [['21:00:00', '25:00:00']]}, 'expire_datetime': 1581922800.0, 'delivery_month': 2, 'delivery_year': 2020, 'option_class': '', 'product_id': 'cu', 'iopv': nan, 'margin': 16443.0, 'commission': 11.745000000000001}
         """
         # 预设服务器端响应
         dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -210,6 +212,7 @@ class TestTdBacktest(unittest.TestCase):
         position1 = api.get_position(symbol1)
         position2 = api.get_position(symbol2)
         position3 = api.get_position(symbol3)
+        print(quote3)
         try:
             # 1 回测起始时间(21:00:00)下单
             order1 = api.insert_order(symbol=symbol1, direction="BUY", offset="OPEN", volume=1,
@@ -246,7 +249,7 @@ class TestTdBacktest(unittest.TestCase):
             self.assertEqual(order3.offset, 'OPEN')
             self.assertEqual(order3.volume_orign, 3)
             self.assertEqual(order3.volume_left, 0)
-            self.assertEqual(order3.limit_price, 47390.0)
+            self.assertEqual(order3.limit_price, 47320.0)
             self.assertEqual(order3.price_type, 'LIMIT')
             self.assertEqual(order3.volume_condition, 'ANY')
             self.assertEqual(order3.time_condition, 'GFD')
@@ -270,9 +273,9 @@ class TestTdBacktest(unittest.TestCase):
             self.assertEqual(order2.volume_left, 0)
             self.assertEqual(order3.volume_orign, 3)
             self.assertEqual(order3.volume_left, 0)
-            self.assertEqual(1575292559999999000, order1.insert_date_time)
-            self.assertEqual(1575292559999999000, order2.insert_date_time)
-            self.assertEqual(1575292559999999000, order3.insert_date_time)
+            self.assertEqual(1575292500000000000, order1.insert_date_time)
+            self.assertEqual(1575292500000000000, order2.insert_date_time)
+            self.assertEqual(1575292500000000000, order3.insert_date_time)
 
             # 3 23：00rb2002停止交易后不能下单，cu2002能下单；
             while datetime.datetime.strptime(quote3.datetime, "%Y-%m-%d %H:%M:%S.%f") < datetime.datetime(2019, 12, 2,
@@ -292,9 +295,9 @@ class TestTdBacktest(unittest.TestCase):
             self.assertEqual(order2.volume_left, 2)
             self.assertEqual(order3.volume_orign, 3)
             self.assertEqual(order3.volume_left, 0)
-            self.assertEqual(1575298859999999000, order1.insert_date_time)
-            self.assertEqual(1575298859999999000, order2.insert_date_time)
-            self.assertEqual(1575298859999999000, order3.insert_date_time)
+            self.assertEqual(1575298800000000000, order1.insert_date_time)
+            self.assertEqual(1575298800000000000, order2.insert_date_time)
+            self.assertEqual(1575298800000000000, order3.insert_date_time)
 
             while True:
                 api.wait_update()
@@ -370,9 +373,9 @@ class TestTdBacktest(unittest.TestCase):
             self.assertEqual(order2.volume_left, 0)
             self.assertEqual(order3.volume_orign, 3)
             self.assertEqual(order3.volume_left, 0)
-            self.assertEqual(1581906059999999000, order1.insert_date_time)
-            self.assertEqual(1581906059999999000, order2.insert_date_time)
-            self.assertEqual(1581906059999999000, order3.insert_date_time)
+            self.assertEqual(1581906000000000000, order1.insert_date_time)
+            self.assertEqual(1581906000000000000, order2.insert_date_time)
+            self.assertEqual(1581906000000000000, order3.insert_date_time)
 
             # 3 10:30 - 10:45之间 IF、T、cu都能下单；
             while datetime.datetime.strptime(quote3.datetime, "%Y-%m-%d %H:%M:%S.%f") < datetime.datetime(2020, 2, 17,
@@ -390,9 +393,9 @@ class TestTdBacktest(unittest.TestCase):
             self.assertEqual(order2.volume_left, 0)
             self.assertEqual(order3.volume_orign, 3)
             self.assertEqual(order3.volume_left, 0)
-            self.assertEqual(1581906659999999000, order1.insert_date_time)
-            self.assertEqual(1581906659999999000, order2.insert_date_time)
-            self.assertEqual(1581906659999999000, order3.insert_date_time)
+            self.assertEqual(1581906600000000000, order1.insert_date_time)
+            self.assertEqual(1581906600000000000, order2.insert_date_time)
+            self.assertEqual(1581906600000000000, order3.insert_date_time)
 
             while True:
                 api.wait_update()
@@ -474,9 +477,9 @@ class TestTdBacktest(unittest.TestCase):
             self.assertEqual(order2.volume_left, 0)
             self.assertEqual(order3.volume_orign, 3)
             self.assertEqual(order3.volume_left, 0)
-            self.assertEqual(1581906659999999000, order1.insert_date_time)
-            self.assertEqual(1581906659999999000, order2.insert_date_time)
-            self.assertEqual(1581906659999999000, order3.insert_date_time)
+            self.assertEqual(1581906600000000000, order1.insert_date_time)
+            self.assertEqual(1581906600000000000, order2.insert_date_time)
+            self.assertEqual(1581906600000000000, order3.insert_date_time)
 
             # 3 11：29：29.999999 能下单
             while max(quote1.datetime, quote2.datetime, quote3.datetime) != "2020-02-17 11:29:59.999999":
@@ -537,9 +540,9 @@ class TestTdBacktest(unittest.TestCase):
             self.assertEqual(order2.volume_left, 0)
             self.assertEqual(order3.volume_orign, 3)
             self.assertEqual(order3.volume_left, 0)
-            self.assertEqual(1581917459999999000, order1.insert_date_time)
-            self.assertEqual(1581917459999999000, order2.insert_date_time)
-            self.assertEqual(1581917459999999000, order3.insert_date_time)
+            self.assertEqual(1581917400000000000, order1.insert_date_time)
+            self.assertEqual(1581917400000000000, order2.insert_date_time)
+            self.assertEqual(1581917400000000000, order3.insert_date_time)
 
             # 6 15:00 - 15:15 : T能下单，IF、cu不能下单;
             while max(quote1.datetime, quote2.datetime, quote3.datetime) < "2020-02-17 15:00:00.000000":
@@ -558,9 +561,9 @@ class TestTdBacktest(unittest.TestCase):
             self.assertEqual(order2.volume_left, 0)
             self.assertEqual(order3.volume_orign, 3)
             self.assertEqual(order3.volume_left, 3)
-            self.assertEqual(1581922859999999000, order1.insert_date_time)
-            self.assertEqual(1581922859999999000, order2.insert_date_time)
-            self.assertEqual(1581922859999999000, order3.insert_date_time)
+            self.assertEqual(1581922800000000000, order1.insert_date_time)
+            self.assertEqual(1581922800000000000, order2.insert_date_time)
+            self.assertEqual(1581922800000000000, order3.insert_date_time)
 
             # 7 15:14:59 只有T2003能下单
             while max(quote1.datetime, quote2.datetime, quote3.datetime) != "2020-02-17 15:14:59.999999":
@@ -580,7 +583,6 @@ class TestTdBacktest(unittest.TestCase):
             self.assertEqual(1581923699999999000, order1.insert_date_time)
             self.assertEqual(1581923699999999000, order2.insert_date_time)
             self.assertEqual(1581923699999999000, order3.insert_date_time)
-
             while True:
                 api.wait_update()
         except BacktestFinished:
@@ -657,9 +659,9 @@ class TestTdBacktest(unittest.TestCase):
             self.assertEqual(order2.volume_left, 0)
             self.assertEqual(order3.volume_orign, 3)
             self.assertEqual(order3.volume_left, 3)
-            self.assertEqual(1575032459999999000, order1.insert_date_time)
-            self.assertEqual(1575032459999999000, order2.insert_date_time)
-            self.assertEqual(1575032459999999000, order3.insert_date_time)
+            self.assertEqual(1575032400000000000, order1.insert_date_time)
+            self.assertEqual(1575032400000000000, order2.insert_date_time)
+            self.assertEqual(1575032400000000000, order3.insert_date_time)
 
             # 3 周六凌晨1点前：cu能下单
             while max(quote1.datetime, quote2.datetime, quote3.datetime) < "2019-11-30 00:01:00.000000":
@@ -678,16 +680,17 @@ class TestTdBacktest(unittest.TestCase):
             self.assertEqual(order2.volume_left, 2)
             self.assertEqual(order3.volume_orign, 3)
             self.assertEqual(order3.volume_left, 3)
-            self.assertEqual(1575043319999999000, order1.insert_date_time)
-            self.assertEqual(1575043319999999000, order2.insert_date_time)
-            self.assertEqual(1575043319999999000, order3.insert_date_time)
+            self.assertEqual(1575043260000000000, order1.insert_date_time)
+            self.assertEqual(1575043260000000000, order2.insert_date_time)
+            self.assertEqual(1575043260000000000, order3.insert_date_time)
 
             # 4 周一早9点后都能下单
             while max(quote1.datetime, quote2.datetime, quote3.datetime) < "2019-12-02 09:00:00.000000":
                 api.wait_update()
             order1 = api.insert_order(symbol=symbol1, direction="SELL", offset="OPEN", volume=1,
                                       limit_price=quote1.last_price)
-            order2 = api.insert_order(symbol=symbol2, direction="BUY", offset="OPEN", volume=2,
+            # 这里是一个交易时间段的开始，改成 K 线开始的时候生成 quote.last_price，open 价格比较低，用 BUY 没法成交，这里改成 SELL
+            order2 = api.insert_order(symbol=symbol2, direction="SELL", offset="OPEN", volume=2,
                                       limit_price=quote2.last_price)
             order3 = api.insert_order(symbol=symbol3, direction="BUY", offset="OPEN", volume=3,
                                       limit_price=quote3.last_price)
@@ -699,12 +702,21 @@ class TestTdBacktest(unittest.TestCase):
             self.assertEqual(order2.volume_left, 0)
             self.assertEqual(order3.volume_orign, 3)
             self.assertEqual(order3.volume_left, 0)
-            self.assertEqual(1575248459999999000, order1.insert_date_time)
-            self.assertEqual(1575248459999999000, order2.insert_date_time)
-            self.assertEqual(1575248459999999000, order3.insert_date_time)
+            self.assertEqual(1575248400000000000, order1.insert_date_time)
+            self.assertEqual(1575248400000000000, order2.insert_date_time)
+            self.assertEqual(1575248400000000000, order3.insert_date_time)
 
             # 5 周一晚21点后cu和rb能下单
-            while max(quote1.datetime, quote2.datetime, quote3.datetime) < "2019-12-02 21:00:00.000000":
+            while max(quote1.datetime, quote2.datetime, quote3.datetime) < "2019-12-02 21:00:30.000000":
+                # 在涉及到交易日切换的时候
+                # 1. 只在 1 分钟线结束的时候生成 quote，在某个行情大于等于 "21:00:00" 时，也就是某个行情等于 "21:00:59.999" 的时候，
+                # sim 其实在已经收到了 1 分钟线开始的 k 线，在此循环退出之前，已经完成了上一个交易日结算，所以循环退出可以直接下单
+                # 2. 在 1 分钟线开始和结束的时候都生成 quote，在某个行情大于等于 "21:00:00" 时，sim 的时间还没推进到 "21:00:00"，
+                # sim 会在退出此循环之后的，下一次 wait_update 里完成交易日结算，所以如果在循环退出后直接下单，会造成：
+                # (1) 能够立即成交的单子在上一个交易日的交易记录里，但是时间是 "21:00:00"
+                # (2) 不能立即成交的单子，会因为交易日结算撤单
+                # 总的来说，这里矛盾的地方是：用户代码会先于 sim 得到新的行情，用户根据这个行情作出的决策，sim 其实会先用旧的数据处理，
+                # 直到代码运行到处理新的行情数据包，中间这一段 sim 的处理是用错误的数据在处理
                 api.wait_update()
             order1 = api.insert_order(symbol=symbol1, direction="BUY", offset="OPEN", volume=1,
                                       limit_price=quote1.last_price)
@@ -728,7 +740,7 @@ class TestTdBacktest(unittest.TestCase):
                 api.wait_update()
         except BacktestFinished:
             self.assertEqual(position1.pos, -2)
-            self.assertEqual(position2.pos, 6)
+            self.assertEqual(position2.pos, 2)
             self.assertEqual(position3.pos, 3)
             api.close()
 
@@ -927,9 +939,9 @@ class TestTdBacktest(unittest.TestCase):
             self.assertEqual(order2.volume_left, 0)
             self.assertEqual(order3.volume_orign, 3)
             self.assertEqual(order3.volume_left, 0)
-            self.assertEqual(1575248459999999000, order1.insert_date_time)
-            self.assertEqual(1575248459999999000, order2.insert_date_time)
-            self.assertEqual(1575248459999999000, order3.insert_date_time)
+            self.assertEqual(1575248400000000000, order1.insert_date_time)
+            self.assertEqual(1575248400000000000, order2.insert_date_time)
+            self.assertEqual(1575248400000000000, order3.insert_date_time)
 
             while True:
                 api.wait_update()
